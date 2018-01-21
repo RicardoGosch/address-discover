@@ -89,7 +89,7 @@ export default {
             });
         },
         search: function(){
-            if(this.cep.length === 8 || this.cep.length === 9)
+            if(this.cep && (this.cep.length === 8 || this.cep.length === 9))
                 // Search by cep
                 this.searchByCep();
             else

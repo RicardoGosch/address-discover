@@ -11,7 +11,7 @@
             <div class="form-group">
                 <section>
                     <h2 class="form-label">Selecione o Estado:</h2>
-                    <input type="button" class="form-item form-item-button" title="Selecione um Estado" @click.prevent="toggleStates = !toggleStates" v-bind:value="state ? state.name : 'Selecione'">
+                    <input type="button" class="form-item form-item-button icon-arrow" title="Selecione um Estado" @click.prevent="toggleStates = !toggleStates" v-bind:value="state ? state.name : 'Selecione'">
                     <div class="group-list" v-bind:class="{show: toggleStates}">
                         <input type="text" class="group-filter" placeholder="Filtre pelos estados" id="filter" v-model="filter" @input="filter = $event.target.value">
                         <div class="group-items">
@@ -132,7 +132,7 @@ export default {
       if (this.cep && (this.cep.length === 8 || this.cep.length === 9))
         // Search by cep
         this.searchByCep();
-      else
+      else if(this.state && this.city && this.address)
         // Search by address
         this.searchByAddress();
     },
@@ -192,6 +192,12 @@ export default {
     font-family: "Lato", sans-serif;
     box-shadow: none;
 }
+.form-item.icon-arrow {
+    background-image: url('../assets/arrow.png');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    cursor: pointer;
+}
 .group-list {
     background-color: white;
     border-radius: 3px;
@@ -223,10 +229,10 @@ export default {
     max-height: 40vh;
     transition: ease 0.5s;
     overflow-y: auto;
-    height: 0;
+    height: auto;
 }
 .group-list.show .group-items {
-    height: 100vh;
+    height: auto;
 }
 
 .group-item {

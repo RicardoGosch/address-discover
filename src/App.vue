@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <Header/>
-    <AddressDiscover/>
+    <main>
+      <AddressDiscover/>
+    </main>
   </div>
 </template>
 
@@ -25,6 +27,18 @@ export default {
 </script>
 
 <style>
-#app {
+@import url('https://fonts.googleapis.com/css?family=Lato');
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #403F4C;
+  font-family: 'Lato', sans-serif;
+}
+* {
+  box-sizing: border-box;
+
+}
+main {
+  margin: 40px 0;
 }
 </style>

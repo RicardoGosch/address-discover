@@ -1,15 +1,42 @@
 <template>
     <div class="container">
-        <form action="#">
-            <input type="text" placeholder="CEP" v-model="cep" >
-            <select name="uf" id="uf" v-model="uf">
-                <option value=undefined selected disabled>Selecione</option>
-                <option v-for="state in states" v-bind:value="state.uf" v-bind:key="state.uf">{{ state.name }}</option>
-            </select>
-            <input type="text" v-model="city" placeholder="Cidade">
-            <input type="text" v-model="address" placeholder="Rua">
-            <button type="submit" @click.prevent='search'>Descobrir</button>
-            <button type="reset" @click.prevent='reset'>Limpar</button>
+        <form @submit.prevent="search" class="form">
+            <div class="form-group">
+                <label class="form-label" for="cep">Descubra o endereço a partir do CEP:</label>
+                <input class="form-item" type="text" placeholder="Ex.: 00000-000" id="cep" v-model="cep">
+            </div>
+            <div class="form-big-divisor">
+                <span class="text">Ou</span>
+            </div>
+            <div class="form-group">
+                <section>
+                    <h2 class="form-label">Selecione o Estado:</h2>
+                    <button class="form-item form-item-button" title="Selecione um Estado" @click.prevent="toggleStates = !toggleStates">{{ state ? state.name : 'Selecione' }}</button>
+                    <div class="group-list" v-bind:class="{show: toggleStates}">
+                        <input type="text" class="group-filter" placeholder="Filtre pelos estados" id="filter">
+                        <div class="group-items">
+                            <div class="group-item" v-for="s in states" v-bind:key="s.uf">
+                                <input type="radio" class="form-hidden .radio" v-bind:id="s.uf" v-bind:value="s" v-bind:key="s.uf" v-model="state">
+                                <label class="group-label" v-bind:for="s.uf">{{ s.name }}</label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="form-group">
+                <label for="city" class="form-label">Digite a Cidade:</label>
+                <input  class="form-item" type="text" v-model="city" id="city" placeholder="Ex.: São Paulo">
+            </div>
+            <div class="form-group">
+                <label for="address" class="form-label">Digite o Logradouro/Rua:</label>
+                <input class="form-item" type="text" id="address" v-model="address" placeholder="Ex.: Rua São Gabriel">
+            </div>
+
+            <div class="form-group form-group__buttons">
+                <button class="btn btn-success" type="submit" @click.prevent='search'>Descobrir</button>
+                <button class="btn btn-warning" type="reset" @click.prevent='reset'>Limpar</button>
+            </div>
+
         </form>
     </div>
 </template>
@@ -21,9 +48,10 @@ export default {
 	data () {
 		return {
             cep: undefined,
-            uf: undefined,
+            state: undefined,
             city: undefined,
             address: undefined,
+            toggleStates: false,
             states: [
                 {uf: 'AC', name: 'Acre'},
                 {uf: 'AL', name: 'Alagoas'},
@@ -65,16 +93,19 @@ export default {
             });
         },
         searchByAddress: function(){
-            let api = 'http://viacep.com.br/ws/'+this.uf+'/'+this.city+'/'+this.address+'/json/';
+            let api = 'http://viacep.com.br/ws/'+this.state.uf+'/'+this.city+'/'+this.address+'/json/';
             let self = this;
-            console.log(api);
             this.api(api, function(data){
                 if(data.error) return;
                 self.fill(data[0]);
             });
         },
         fill: function(data){
-            this.uf = data.uf;
+            let self = this;
+            this.getState(data.uf, function(state){
+                self.state = state;
+            });
+            this.stat = data.uf;
             this.city = data.localidade;
             this.address = data.logradouro;
             this.cep = data.cep;
@@ -98,9 +129,14 @@ export default {
         },
         reset: function(){
             this.cep = undefined;
-            this.uf = undefined;
+            this.state = undefined;
             this.city = undefined;
             this.address = undefined;
+        },
+        getState: function(state, callback){
+            this.states.forEach(s => {
+                if(s.uf === state) callback(s);
+            });
         }
     },
 }
@@ -108,4 +144,131 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.form {
+    width: 250px;
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+}
+.form-group {
+    width: 100%;
+    margin-bottom: 23px;
+    position: relative;
+}
+.form-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    margin: 0 0 5px 0;
+    display: block;
+    cursor: default;
+}
+.form-item {
+    width: 100%;
+    height: 50px;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #403F4C;
+    border: none;
+    padding: 0 15px;
+    text-align: left;
+    background-color: #EFE9F4;
+    font-family: 'Lato', sans-serif;
+    box-shadow: none;
+}
+.group-list {
+    background-color: white;
+    border-radius: 3px;
+    margin: 3px 0 0 0;
+    overflow: hidden;
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+    opacity: 0;
+    transition: ease .5s;
+}
+.group-list.show {
+    opacity: 1;
+    pointer-events: all;
+}
+.group-filter {
+    margin: 15px;
+    width: calc(100% - 30px);
+    height: 40px;
+    padding: 0 15px;
+    color: #403F4C;
+    border-radius: 3px;
+    border: none;
+    background-color: #EFE9F4;
+}
+.group-items {
+    max-height: 40vh;
+    transition: ease .5s;
+    overflow-y: auto;
+    height: 0;
+}
+.group-list.show .group-items {
+    height: 100vh;
+}
+
+.group-item {
+
+}
+.group-item .group-label {
+    color: #403F4C;
+    min-height: 30px;
+    line-height: 30px;
+    padding: 0 30px;
+    cursor: pointer;
+    margin: 0;
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+}
+.group-item input[type="radio"]:checked + .group-label {
+    background-color: #EFE9F4;
+}
+.form-hidden {
+    position: absolute;
+    left: -999pc;
+}
+.btn {
+    height: 50px;
+    width: 100%;
+    margin: 4px 0;
+    border: none;
+    text-transform: uppercase;
+    color: black;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn.btn-success {
+    background-color: #77CBB9;
+    font-weight: bold;
+}
+.form-big-divisor {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 23px 0 46px 0;
+}
+.form-big-divisor::after, .form-big-divisor::before {
+    content: '';
+    width: 50px;
+    height: 1px;
+    background-color: #2F2E38;
+}
+.form-big-divisor .text {
+    text-transform: uppercase;
+    font-size: 35px;
+    color: #2F2E38;
+    font-weight: bold;
+    margin: 0 10px;
+    cursor: default;
+}
+
 </style>

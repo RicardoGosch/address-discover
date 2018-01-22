@@ -1,13 +1,16 @@
 <template>
     <div class="container">
         <form @submit.prevent="search" class="form">
+            <!-- cep -->
             <div class="form-group">
                 <label class="form-label" for="cep">Descubra o endereço a partir do CEP:</label>
                 <input class="form-item" type="text" placeholder="Ex.: 00000-000" id="cep" v-model="cep">
             </div>
+            <!-- divisor -->
             <div class="form-big-divisor">
                 <span class="text">Ou</span>
             </div>
+            <!-- state -->
             <div class="form-group">
                 <section>
                     <h2 class="form-label">Selecione o Estado:</h2>
@@ -23,20 +26,21 @@
                     </div>
                 </section>
             </div>
+            <!-- city -->
             <div class="form-group">
                 <label for="city" class="form-label">Digite a Cidade:</label>
                 <input  class="form-item" type="text" v-model="city" id="city" placeholder="Ex.: São Paulo">
             </div>
+            <!-- address -->
             <div class="form-group">
                 <label for="address" class="form-label">Digite o Logradouro/Rua:</label>
                 <input class="form-item" type="text" id="address" v-model="address" placeholder="Ex.: Rua São Gabriel">
             </div>
-
+            <!-- buttons -->
             <div class="form-group form-group__buttons">
                 <button class="btn btn-success" type="submit" @click.prevent='search'>Descobrir</button>
                 <button class="btn btn-warning" type="reset" @click.prevent='reset'>Limpar</button>
             </div>
-
         </form>
     </div>
 </template>
@@ -44,116 +48,116 @@
 <script>
 import axios from "axios";
 export default {
-  name: "AddressDiscover",
-  data() {
-    return {
-      cep: undefined,
-      state: undefined,
-      city: undefined,
-      address: undefined,
-      toggleStates: false,
-      filter: undefined,
-      states: [
-        { uf: "AC", name: "Acre" },
-        { uf: "AL", name: "Alagoas" },
-        { uf: "AP", name: "Amapá" },
-        { uf: "AM", name: "Amazonas" },
-        { uf: "BA", name: "Bahia" },
-        { uf: "CE", name: "Ceará" },
-        { uf: "DF", name: "Distrito Federal" },
-        { uf: "ES", name: "Espírito Santo" },
-        { uf: "GO", name: "Goiás" },
-        { uf: "MA", name: "Maranhão" },
-        { uf: "MT", name: "Mato Grosso" },
-        { uf: "MS", name: "Mato Grosso do Sul" },
-        { uf: "MG", name: "Minas Gerais" },
-        { uf: "PA", name: "Pará" },
-        { uf: "PB", name: "Paraíba" },
-        { uf: "PR", name: "Paraná" },
-        { uf: "PE", name: "Pernambuco" },
-        { uf: "PI", name: "Piauí" },
-        { uf: "RJ", name: "Rio de Janeiro" },
-        { uf: "RN", name: "Rio Grande do Norte" },
-        { uf: "RS", name: "Rio Grande do Sul" },
-        { uf: "RO", name: "Rondônia" },
-        { uf: "RR", name: "Roraima" },
-        { uf: "SC", name: "Santa Catarina" },
-        { uf: "SP", name: "São Paulo" },
-        { uf: "SE", name: "Sergipe" },
-        { uf: "TO", name: "Tocantins" }
-      ]
-    };
-  },
-  methods: {
-    searchByCep: function() {
-      let api = "http://viacep.com.br/ws/" + this.cep + "/json/";
-      let self = this;
-      this.api(api, function(data) {
-        if (data.error) return;
-        self.fill(data);
-      });
+    name: "AddressDiscover",
+    data() {
+        return {
+            cep: undefined,
+            state: undefined,
+            city: undefined,
+            address: undefined,
+            toggleStates: false,
+            filter: undefined,
+            states: [
+                { uf: "AC", name: "Acre" },
+                { uf: "AL", name: "Alagoas" },
+                { uf: "AP", name: "Amapá" },
+                { uf: "AM", name: "Amazonas" },
+                { uf: "BA", name: "Bahia" },
+                { uf: "CE", name: "Ceará" },
+                { uf: "DF", name: "Distrito Federal" },
+                { uf: "ES", name: "Espírito Santo" },
+                { uf: "GO", name: "Goiás" },
+                { uf: "MA", name: "Maranhão" },
+                { uf: "MT", name: "Mato Grosso" },
+                { uf: "MS", name: "Mato Grosso do Sul" },
+                { uf: "MG", name: "Minas Gerais" },
+                { uf: "PA", name: "Pará" },
+                { uf: "PB", name: "Paraíba" },
+                { uf: "PR", name: "Paraná" },
+                { uf: "PE", name: "Pernambuco" },
+                { uf: "PI", name: "Piauí" },
+                { uf: "RJ", name: "Rio de Janeiro" },
+                { uf: "RN", name: "Rio Grande do Norte" },
+                { uf: "RS", name: "Rio Grande do Sul" },
+                { uf: "RO", name: "Rondônia" },
+                { uf: "RR", name: "Roraima" },
+                { uf: "SC", name: "Santa Catarina" },
+                { uf: "SP", name: "São Paulo" },
+                { uf: "SE", name: "Sergipe" },
+                { uf: "TO", name: "Tocantins" }
+            ]
+        };
     },
-    searchByAddress: function() {
-      let api =
-        "http://viacep.com.br/ws/" +
-        this.state.uf +
-        "/" +
-        this.city +
-        "/" +
-        this.address +
-        "/json/";
-      let self = this;
-      this.api(api, function(data) {
-        if (data.error) return;
-        self.fill(data[0]);
-      });
-    },
-    fill: function(data) {
-      let self = this;
-      this.getState(data.uf, function(state) {
-        self.state = state;
-      });
-      this.stat = data.uf;
-      this.city = data.localidade;
-      this.address = data.logradouro;
-      this.cep = data.cep;
-    },
-    api: function(url, callback) {
-      axios
-        .get(url)
-        .then(function(response) {
-          callback(response.data);
-        })
-        .catch(e => {
-          console.error(e);
-        });
-    },
-    search: function() {
-      if (this.cep && (this.cep.length === 8 || this.cep.length === 9))
-        // Search by cep
-        this.searchByCep();
-      else if(this.state && this.city && this.address)
-        // Search by address
-        this.searchByAddress();
-    },
-    reset: function() {
-      this.cep = undefined;
-      this.state = undefined;
-      this.city = undefined;
-      this.address = undefined;
-    },
-    getState: function(state, callback) {
-      this.states.forEach(s => {
-        if (s.uf === state) callback(s);
-      });
-    },
-    filterStates: function() {
-      if (!this.filter) return this.states;
+    methods: {
+        searchByCep: function() {
+            let api = "http://viacep.com.br/ws/" + this.cep + "/json/";
+            let self = this;
+            this.api(api, function(data) {
+                if (data.error) return;
+                self.fill(data);
+            });
+        },
+        searchByAddress: function() {
+            let api =
+            "http://viacep.com.br/ws/" +
+            this.state.uf +
+            "/" +
+            this.city +
+            "/" +
+            this.address +
+            "/json/";
+            let self = this;
+            this.api(api, function(data) {
+                if (data.error) return;
+                self.fill(data[0]);
+            });
+        },
+        fill: function(data) {
+            let self = this;
+            this.getState(data.uf, function(state) {
+                self.state = state;
+            });
+            this.stat = data.uf;
+            this.city = data.localidade;
+            this.address = data.logradouro;
+            this.cep = data.cep;
+        },
+        api: function(url, callback) {
+            axios
+            .get(url)
+            .then(function(response) {
+                callback(response.data);
+            })
+            .catch(e => {
+                console.error(e);
+            });
+        },
+        search: function() {
+            if (this.cep && (this.cep.length === 8 || this.cep.length === 9))
+            // Search by cep
+            this.searchByCep();
+            else if(this.state && this.city && this.address)
+            // Search by address
+            this.searchByAddress();
+        },
+        reset: function() {
+            this.cep = undefined;
+            this.state = undefined;
+            this.city = undefined;
+            this.address = undefined;
+        },
+        getState: function(state, callback) {
+            this.states.forEach(s => {
+                if (s.uf === state) callback(s);
+            });
+        },
+        filterStates: function() {
+            if (!this.filter) return this.states;
 
-      let expression = RegExp(this.filter.trim(), "i");
-      return this.states.filter(state => expression.test(state.name));
+            let expression = RegExp(this.filter.trim(), "i");
+            return this.states.filter(state => expression.test(state.name));
+        }
     }
-  }
 };
 </script>
 
@@ -233,9 +237,6 @@ export default {
 }
 .group-list.show .group-items {
     height: auto;
-}
-
-.group-item {
 }
 .group-item .group-label {
     color: #403f4c;

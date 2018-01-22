@@ -11,7 +11,7 @@
             <div class="form-group">
                 <section>
                     <h2 class="form-label">Selecione o Estado:</h2>
-                    <button class="form-item form-item-button" title="Selecione um Estado" @click.prevent="toggleStates = !toggleStates">{{ state ? state.name : 'Selecione' }}</button>
+                    <input type="button" class="form-item form-item-button" title="Selecione um Estado" @click.prevent="toggleStates = !toggleStates" v-bind:value="state ? state.name : 'Selecione'">
                     <div class="group-list" v-bind:class="{show: toggleStates}">
                         <input type="text" class="group-filter" placeholder="Filtre pelos estados" id="filter" v-model="filter" @input="filter = $event.target.value">
                         <div class="group-items">

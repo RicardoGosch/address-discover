@@ -90,7 +90,7 @@ export default {
     },
     methods: {
         searchByCep: function() {
-            let api = "http://viacep.com.br/ws/" + this.cep + "/json/";
+            let api = "//viacep.com.br/ws/" + this.cep + "/json/";
             let self = this;
             this.api(api, function(data) {
                 if (data.error) return;
@@ -99,7 +99,7 @@ export default {
         },
         searchByAddress: function() {
             let api =
-            "http://viacep.com.br/ws/" +
+            "//viacep.com.br/ws/" +
             this.state.uf +
             "/" +
             this.city +
